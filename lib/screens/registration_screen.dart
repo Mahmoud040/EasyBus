@@ -1,96 +1,201 @@
+import 'package:flash_chat/screens/driverSeats.dart';
+import 'package:flash_chat/screens/seats.dart';
+import 'package:flash_chat/screens/stations_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flash_chat/components/roundedbutton.dart';
+import 'package:flash_chat/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flash_chat/Customer.dart';
+import 'package:flash_chat/Driver.dart';
+
+enum SingingCharacter { Customer, Driver }
 
 class RegistrationScreen extends StatefulWidget {
+  static const String id = 'registration_screen';
+
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  SingingCharacter _character = SingingCharacter.Customer;
+  bool radioButtonstate = false;
+  final _auth = FirebaseAuth.instance;
+  FirebaseFirestore fs = FirebaseFirestore.instance;
+  String username;
+  String email;
+  String password;
+  String confirmPassword;
+  String busnumber;
+  String stationNumber;
+
+  final fieldText1 = TextEditingController();
+  final fieldText2 = TextEditingController();
+  final fieldText3= TextEditingController();
+  final fieldText4 = TextEditingController();
+  void clearText() {
+    fieldText1.clear();
+    fieldText2.clear();
+    fieldText3.clear();
+    fieldText4.clear();
+  }
+  @override
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Container(
-              height: 200.0,
-              child: Image.asset('images/logo.png'),
-            ),
-            SizedBox(
-              height: 48.0,
-            ),
-            TextField(
-              onChanged: (value) {
-                //Do something with the user input.
-              },
-              decoration: InputDecoration(
-                hintText: 'Enter your email',
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent, width: 1.0),
-                  borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
-                  borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 8.0,
-            ),
-            TextField(
-              onChanged: (value) {
-                //Do something with the user input.
-              },
-              decoration: InputDecoration(
-                hintText: 'Enter your password',
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent, width: 1.0),
-                  borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
-                  borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 24.0,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Material(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                elevation: 5.0,
-                child: MaterialButton(
-                  onPressed: () {
-                    //Implement registration functionality.
-                  },
-                  minWidth: 200.0,
-                  height: 42.0,
-                  child: Text(
-                    'Register',
-                    style: TextStyle(color: Colors.white),
+      backgroundColor: Color(0xFF193044),
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 40.0, horizontal: 10),
+          child: ListView(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  enabled: false,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: 'Sign up',
+                    labelStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold),
+                    fillColor: Color(0xFF193044),
+                    contentPadding:
+                    const EdgeInsets.only(left: 14.0, bottom: 6.0, top: 2.0),
                   ),
                 ),
               ),
-            ),
-          ],
+              TextField(
+                controller: fieldText1,
+                keyboardType: TextInputType.name,
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  username = value;
+                },
+                decoration: KTextFieldDecoration.copyWith(
+                    hintText: 'Username'),
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+              TextField(
+                controller: fieldText2,
+                obscureText: true,
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  password = value;
+                },
+                decoration: KTextFieldDecoration.copyWith(
+                    hintText: 'Password'),
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+              TextField(
+                controller: fieldText3,
+                obscureText: true,
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  confirmPassword = value;
+                },
+                decoration: KTextFieldDecoration.copyWith(
+                    hintText: 'Confirm password'),
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+              TextField(
+                controller: fieldText4,
+                keyboardType: TextInputType.emailAddress,
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  email = value;
+                },
+                decoration:
+                    KTextFieldDecoration.copyWith(hintText: 'Email'),
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+              SizedBox(height: 10.0),
+              Roundedbutton(
+                title: 'Cancel',
+                colour: Colors.deepOrange,
+                onPressed: ()  {
+                  fieldText1.clear();
+                  fieldText2.clear();
+                  fieldText3.clear();
+                  fieldText4.clear();
+                },
+              ),
+              Roundedbutton(
+                title: 'Register',
+                colour: Colors.deepOrange,
+                onPressed: () async {
+                  setState(() {});
+                  try {
+                    final newUser = await _auth.createUserWithEmailAndPassword(
+                        email: email, password: password);
+                    if (newUser != null) {
+                      var uid = newUser.user.uid.toString();
+                      if (!radioButtonstate) {
+                        final addUser = fs.collection('Users').doc(uid);
+                        final use = {
+                          'UID': uid,
+                          'Username': username,
+                          'type': 'Customer',
+                          'points':700,
+                        };
+                        final cus = new Customer(
+                            username: username,
+                            password: password,
+                            uid: uid,
+                            email: email,
+                        points:700);
+
+                        await addUser.set(use);
+                        Navigator.of(context).pushReplacement(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) =>
+                                new StationsScreen(cus: cus),),);
+                      } else {
+                        final driv = new Driver(
+                          username: username,
+                          password: password,
+                          uid: uid,
+                          email: email,
+                          stationNo: int.parse(stationNumber),
+                          busNo: int.parse(busnumber),
+                        );
+                        final addUser = fs.collection('Users').doc(uid);
+                        final use = {
+                          'UID': uid,
+                          'Username': username,
+                          'type': 'Driver',
+                          'stationNumber': int.parse(stationNumber),
+                          'busNumber': int.parse(busnumber)
+                        };
+                        await addUser.set(use);
+                        Navigator.of(context).pushReplacement(
+                          PageRouteBuilder(
+                            pageBuilder: (_, __, ___) =>
+                                new DriverSeatsScreen(cus: driv),
+                          ),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    print(e);
+                  }
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
